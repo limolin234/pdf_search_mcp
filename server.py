@@ -1,4 +1,3 @@
-#!/home/limolin/.venvs/default/bin/python
 """MCP server for recursively searching text extracted from PDF files."""
 from __future__ import annotations
 import hashlib
@@ -14,10 +13,7 @@ mcp = MCPServer(
     "pdf_search",
     version="0.1.0",
     instructions=(
-        "用 pdf_search 在一个 PDF 或目录内搜索文本。实现基于 pdftotext 和 rg；"
-        "query 默认按 rg 正则表达式匹配，fixed_string=true 时按字面字符串匹配，"
-        "case_sensitive=true 时区分大小写。结果 matches[].path 始终是原始 PDF 文件路径，"
-        "不要引用或展示内部缓存文件名。"
+        "基于 pdftotext 和 rg 递归搜索指定路径中的 PDF。"
     ),
 )
 
@@ -64,13 +60,21 @@ def cached_text(pdf: Path, digest: str) -> Path:
 
 @mcp.tool(
     description=(
-        "基于 rg 搜索 PDF 提取文本。path 是 PDF 或目录，query 默认是 rg 正则；"
-        "fixed_string=true 改为字面匹配，case_sensitive=true 区分大小写。"
-        "返回的 matches[].path 是原始 PDF 路径。"
+        "path 为 PDF 文件或目录路径；query 默认使用 rg 正则表达式。"
+        "fixed_string=true 使用字面匹配，默认 false；"
+        "case_sensitive=true 区分大小写，默认 false；"
+        "max_results 为最多返回的匹配条数，默认 200，限制在 1 至 2000。"
+        "返回的 matches[].path 是原始 PDF 路径，matches[].line 是提取文本中的行号。"
     ),
     structured_output=True,
 )
-def pdf_search(path: str, query: str, fixed_string: bool = False, case_sensitive: bool = False, max_results: int = 200) -> dict[str, Any]:
+def pdf_search(
+    path: str,
+    query: str,
+    fixed_string: bool = False,
+    case_sensitive: bool = False,
+    max_results: int = 200,
+) -> dict[str, Any]:
     """Search PDF text with rg and return original PDF paths."""
     root = Path(path).expanduser()
     if not query:
