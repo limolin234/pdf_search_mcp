@@ -11,9 +11,9 @@ from mcp.server.mcpserver import MCPServer
 CACHE_DIR = Path(os.environ.get("PDF_RG_CACHE_DIR", "/var/tmp/pdf_rg"))
 mcp = MCPServer(
     "pdf_search",
-    version="0.1.0",
+    version="1.0.0",
     instructions=(
-        "基于 pdftotext 和 rg 递归搜索指定路径中的 PDF。"
+        "基于pdftotext和rg递归搜索指定路径中的PDF,有pdftotext缓存用来加速。"
     ),
 )
 
